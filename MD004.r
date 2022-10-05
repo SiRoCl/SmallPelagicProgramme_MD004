@@ -1,6 +1,6 @@
 #Small Pelagic Sampling Programme (MD004)
 #@silvia Rodriguez Climent
-# 15-05-2022; last modified : 13-09-2022
+# 15-05-2022; last modified : 05-10-2022
 #---------------------------------------------------------------------##
 
 # ===================================================--
@@ -92,19 +92,6 @@ head(db5)
 table(db5$fishingseason)
 
 
-#Extract ANE data for Aaron Braizer
-# 
-# head(db4)
-# ane <- subset(db4,Species=="ANE") #61 21
-# head(ane);dim(ane)
-# 
-# ane <-ane[,c("Lab","Date.sampled","Species","Length","Weight..g.","Sex","Maturity","Notes","otholit.reading",
-#              "month", "year", "fishingseason")]
-# 
-# #write.csv(ane,paste(path.results,'ANE_aaron.csv',sep=""),row.names=F)
-# 
-
-
 ###
 ####1. Evolution of the programme through the years ----
 ###
@@ -121,7 +108,7 @@ count3 <- with(db0,aggregate(Sample,list(Species=Species,month=month,Lab=Lab,fis
 #total number of individuals sampled per season
 boxplot(count$x~count$fishingseason,xlab="Fishing season",ylab="Number of individuals sampled")
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"boxplot_samples_years.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"boxplot_samples_years.png",sep="/"),width=1000,height=800)
 
 
 #total number of individuals sampled per season and species
@@ -129,7 +116,7 @@ ggplot(count, aes(x = fishingseason, y = x, fill = Species)) + theme_bw()+
   geom_col(position = position_dodge2(width=0.9,preserve="single"))+ xlab("fishing season")+ylab("Number of individuals sampled")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"N_samples_years.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"N_samples_years.png",sep="/"),width=1000,height=800)
 
 
 #total number of individuals sampled per season,species and month
@@ -153,7 +140,7 @@ ggplot(count2, aes(x = month, y = x, fill = Species)) + theme_bw()+
   xlab("fishing season")+ylab("Number of individuals sampled")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"N_samples_monthyears.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"N_samples_monthyears.png",sep="/"),width=1000,height=800)
 
 
 #total number of individuals sampled per season,species and month and location
@@ -180,25 +167,22 @@ ggplot(count3, aes(x = month, y = x, fill = Species)) + theme_bw()+
   xlab("fishing season")+ylab("Number of individuals sampled")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"N_samples_monthLabyears.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"N_samples_monthLabyears.png",sep="/"),width=1000,height=800)
 
 
 ## 1.2 Species-----
 head(db0)
 #db0_agg <- with(db0,aggregate(Length,list(Lab=Lab,Date.sampled=Date.sampled, Species=Species, Length=Length,fishingseason=fishingseason,month=month,year=year),length))
 
-ggplot(db0, aes(x=Length,color=Species)) + 
-  geom_histogram(fill="white",alpha=0.5,position="identity")+facet_grid(fishingseason~.)+theme_bw()
+# ggplot(db0, aes(x=Length,color=Species)) + 
+#   geom_histogram(fill="white",alpha=0.5,position="identity")+facet_grid(fishingseason~.)+theme_bw()
 
 ggplot(db0,aes(x=Length, fill=Species)) + 
   geom_histogram(color="black",alpha=0.5, position="identity")+
   facet_grid(fishingseason~Species,scales="free")+theme_bw()+theme(legend.position = "none")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"summary_Lengths_years.png",sep="/"),width=1000,height=800)
-
-# ggplot(db0,aes(x=Length, fill=Species)) + 
-#   geom_histogram(color="black",alpha=0.5, position="identity")+facet_grid(fishingseason~Species~month)+theme_bw()
+dev.print(device=png,filename=paste(path.results,"summary_Lengths_years.png",sep="/"),width=1000,height=800)
 
 
 
@@ -206,39 +190,7 @@ ggplot(db0,aes(x=Length, fill=Species)) +
 #### 2. Map of the different sampling locations ----
 ###
 
-#https://r-spatial.org/r/2018/10/25/ggplot2-sf.html
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
-class(world)
-
-
-ggplot(data = world) +
-  geom_sf(fill="antiquewhite") +
-  coord_sf(xlim = c(-8.00, -2.00), ylim = c(49.50, 51.50), expand = FALSE)+
-  #annotate(geom="text",x=-5.4, y=50.2, label="Hayle",color="blue",size=3)+
-  annotate(geom="text",x=-4.3, y=50.3, label="Plymouth",color="black",size=4,fontface="bold")+
-  annotate(geom="text",x=-5.5, y=50.11, label="Newlyn",color="black",size=4,fontface="bold")+
-  annotate(geom="text",x=-3.0,y=49.8,label="English Channel",color="blue",size=5,fontface="italic")+
-  annotate(geom="text",x=-7.0,y=50.8,label="Celtic Sea",color="blue",size=5,fontface="italic")+
-  annotate(geom="text",x=-4.5,y=50.15,label="Plymouth Sound",color="blue",size=3,fontface="italic")+
-  annotate(geom="text",x=-5.6,y=49.95,label="Mounts Bay",color="blue",size=3,fontface="italic")+
-
-
-  ggtitle("")+
-  xlab("Longitude")+ylab("Latitude")+
-  theme(panel.grid.major = element_line(color=gray(.5),linetype="dashed",size=0.5),panel.background = element_rect(fill="aliceblue"))+
-
-  annotation_north_arrow(location = "bl", which_north = "true",
-                         pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
-                         style = north_arrow_fancy_orienteering)
-
-#ggsave(device=png,filename=paste(path.results,"map1.png",sep="/"),limitsize = FALSE)
-
-
-#better map----
-
 #bathy data
-#setwd("Y:/MD004G_Small pelagic sampling programme/Working_Area/2022-23/geodata/") # does not work from cdp, download and add your path
 setwd("C:/Users/SRC01/OneDrive - CEFAS/SC/Rscripts/PELTIC_BubbleMaps/Geodata/")
 
 bathy <- readOGR('.','Bathy_contours')
@@ -256,16 +208,13 @@ ylim <- c(49.5,51.5)
 
 coast <- map_data("worldHires", xlim = xlim,ylim=ylim)
 coast.poly <- geom_polygon(data=coast, aes(x=long, y=lat, group=group), colour= "#999999", fill="#999999", lwd=0.2)
-# total NASC
-base<-ggplot()+
-  geom_path(data=bathyF,aes(x=long,y=lat,order=order,group=group,color=contour))+
+# base map
+base <- ggplot()+
+  geom_path(data=bathyF,aes(x=long,y=lat,group=group,color=contour))+
   coast.poly+
   coord_quickmap(xlim,ylim)+
   xlab("Longitude")+ylab("Latitude")+
-  theme_bw()
-
-
-base+annotate(geom="text",x=-4.3, y=50.3, label="Plymouth",color="black",size=4,fontface="bold")+
+  theme_bw()+annotate(geom="text",x=-4.3, y=50.3, label="Plymouth",color="black",size=4,fontface="bold")+
   annotate(geom="text",x=-5.5, y=50.11, label="Newlyn",color="black",size=4,fontface="bold")+
   annotate(geom="text",x=-3.0,y=49.8,label="English Channel",color="blue",size=5,fontface="italic")+
   annotate(geom="text",x=-7.0,y=50.8,label="Celtic Sea",color="blue",size=5,fontface="italic")+
@@ -280,8 +229,10 @@ base+annotate(geom="text",x=-4.3, y=50.3, label="Plymouth",color="black",size=4,
                          pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
                          style = north_arrow_fancy_orienteering)
 
-#ggsave(device=png,filename=paste(path.results,"map2.png",sep="/"),limitsize = FALSE)
-#dev.print(device=png,filename=paste(path.results,"map3.png",sep="/"),width=800,height=800)
+base
+
+ggsave(device=png,filename=paste(path.results,"map.png",sep="/"),limitsize = FALSE)
+#dev.print(device=png,filename=paste(path.results,"map2.png",sep="/"),width=800,height=800)
 
 
 ###
@@ -298,7 +249,7 @@ db <- db5
 distr <- table(db$Sample,db$year,db$month)
 
 ## Total species collected 
-counts <- table(db$Species)
+#counts <- table(db$Species)
 
 #if ANE,HOM,MAC present run this
 # barplot(counts, main="Pelagic Species sampled under the programme",
@@ -306,18 +257,30 @@ counts <- table(db$Species)
 #         ylim = c(0,1600),
 #         space=c(0.1,0.1,0.1),cex.names = 2.5,cex.axis=2.5,cex.main=2.0) #ICES colours
 
-#if HOM,MAC present run this
-barplot(counts, main="Pelagic Species sampled under the programme",
-        xlab="Pelagic Species", ylab="Number of individuals", col=c("yellow","red"),
-        ylim = c(0,800),
-        space=c(0.1,0.1),cex.names = 2.0,cex.axis=2.0,cex.main=2.0) #ICES colours
+# #if HOM,MAC present run this
+# barplot(counts, main="Pelagic Species sampled under the programme",
+#         xlab="Pelagic Species", ylab="Number of individuals", col=c("yellow","red"),
+#         ylim = c(0,800),
+#         space=c(0.1,0.1),cex.names = 2.0,cex.axis=2.0,cex.main=2.0) #ICES colours
+# #Save plot
+# #dev.print(device=png,filename=paste(path.results,"SPSP_species.png",sep="/"),width=1000,height=800)
+
+
+#better plot
+summary(db)
+db.1 <- as.data.table(db)
+ans <-db.1[, .(.N), by = .(Species)] # number of observations by vessel
+a <- ggplot(ans,aes(Species,N,fill=Species))+geom_bar(stat="identity")+theme_bw()  #fill=as.factor(month)
+a
+
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_species.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"SPSP_species.png",sep=""),width=1000,height=800)
+
 
 
 ## Total Species per month and year
-summary(db)
-db.1 <- as.data.table(db)
+# summary(db)
+# db.1 <- as.data.table(db)
 
 ans <-db.1[, .(.N), by = .(Vessel)] # number of observations by vessel
 a <- ggplot(ans,aes(Vessel,N))+geom_bar(stat="identity") #fill=as.factor(month)
@@ -340,10 +303,7 @@ ans$month<- factor(ans$month,levels = c("Jun","Jul","Aug","Sep","Oct","Nov","Dec
 a <- ggplot(ans,aes(Species,N,fill=as.factor(month)))+geom_bar(stat="identity")+theme_bw() #fill=as.factor(month)
 a+facet_grid(rows=vars(month),vars(year),labeller = label_both)+theme(legend.position = "none")
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_speciesbyMonthYear.png",sep="/"),width = 25, height = 20, units = "cm",res=300)
-
-ans <- db.1[, .(.N), by = .(Lab)] # number of observations by Lab
-ans <- db.1[, .(.N), by = .(Sampler)] # number of observations by Sampler
+dev.print(device=png,filename=paste(path.results,"SPSP_speciesbyMonthYear.png",sep="/"),width = 25, height = 20, units = "cm",res=300)
 
 
 #Between labs----
@@ -366,7 +326,7 @@ a <- ggplot(ans,aes(Species,N,fill=as.factor(month)))+geom_bar(stat="identity")+
 a+facet_grid(rows=vars(month,year),vars(Lab),labeller = label_both)+theme(legend.position = "none")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_spmonthLAB.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"SPSP_spmonthLAB.png",sep="/"),width=1000,height=800)
 
 
 # 3.2 Length distributions----
@@ -393,9 +353,9 @@ ggplot(dbmac, aes(x=Length)) +
              color="red", linetype="dashed", size=1)+
   facet_grid(rows=vars(Lab))+ theme_bw()+
   theme (strip.text= element_text(size=15,color="black"))
+
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_MAClabs.png",sep="/"),width=1000,height=800)
-table(dbmac$Lab)
+dev.print(device=png,filename=paste(path.results,"SPSP_MAClabs.png",sep="/"),width=1000,height=800)
 
 
 
@@ -587,7 +547,7 @@ ggplot(plot1, aes(log(Length), log(Weight..g.), col=Lab)) + geom_point() +
   scale_color_brewer(palette = "Dark2")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_MACLWRlabs.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"SPSP_MACLWRlabs.png",sep="/"),width=1000,height=800)
 
 
 #3.5 Otholits and sex sampled----
@@ -597,7 +557,7 @@ head(db)
 table(db$Cell!=0)# 1200 otholits collected this season (1065 last year)
 
 otolits <- subset(db,Cell>0)
-dim(otolits) #1200
+dim(otolits) #otholits collected this season
 
 otolits%>%group_by(fishingseason,Species)%>%
   summarize(sum=length(Cell))
@@ -630,53 +590,35 @@ oto$month <- factor(oto$month,levels = c("Jun","Jul","Aug","Sep","Oct","Nov","De
 a <- ggplot(oto,aes(Species,sum,fill=Species))+geom_bar(stat = "identity")+theme_bw()
 a+facet_grid(rows=vars(month))+scale_x_discrete(name= "Species")+scale_y_continuous(name= "Number of otholits")+theme(legend.position = "none")
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_Numotholits.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"SPSP_Numotholits.png",sep="/"),width=1000,height=800)
 
 
 #per lab
 a <- ggplot(oto,aes(Species,sum,fill=Species))+geom_bar(stat = "identity")+theme_bw()
 a+facet_grid(rows=vars(month),cols=vars(Lab))+scale_x_discrete(name= "Species")+scale_y_continuous(name= "Number of otholits")+theme(legend.position = "none")
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"SPSP_NumotholitsLAB.png",sep="/"),width=1000,height=800)
-
-
-#sex (not for fishing season 2020-2021)
-# sex <- tot[, .(.N), by = .(Sex,Species,month,year)] 
-# sexsum <- tot[, .(length(Sex)), by = .(Sex,Species)] 
-# 
-# sex$Sex[sex$Sex == "<NA>"] <- "NA"
-# sex <- na.omit(sex)
-# 
-# table(small$Sex)
-# 
-# a <- ggplot(sex,aes(Sex,N,fill=as.factor(month)))+geom_bar(stat = "identity")
-# a+facet_grid(rows=vars(month),vars(Species))+theme(legend.position = "none")
-# 
-# b <- ggplot(data = sex, aes(Species, N))+geom_boxplot(aes(fill = Sex))
-# b+scale_fill_manual(values=c("darkorchid1","cyan1","grey","brown"))
-# 
-# #Save plot
-# #dev.print(device=png,filename=paste(path.results,"SPSP_Maturity.png",sep=""),width=1000,height=800)
-
+dev.print(device=png,filename=paste(path.results,"SPSP_NumotholitsLAB.png",sep="/"),width=1000,height=800)
 
 
 #3.6 Some numbers for the report----
 summary(db)
 db.1 <- as.data.table(db)
-db.1[, .(.N),]
+db.1[, .(.N),] #Number of samples
 
 table(db.1$Lab)
 db.1$Lab <- tolower(db.1$Lab)
 db.1[, .(.N), by = .(Lab)] # number of observations by Lab
+
 table(db.1$Sampler)
 db.1$Sampler <- tolower(db.1$Sampler)
+db.1$Sampler[db.1$Sampler=="éilís "] <- "éilís"
 db.1[, .(.N), by = .(Sampler)] # number of observations by Sampler
 
 
-table(db.1$Species)
+table(db.1$Species)#Species sampled
 
-table(db.1$Notes)
 db.1$Notes <- tolower(db.1$Notes)
+table(db.1$Notes)# fresh versus frozen samples
 
 
 db%>%group_by(month,year,fishingseason,Species)%>%
@@ -693,7 +635,6 @@ db%>%group_by(fishingseason,Species)%>%
             min_L=min(Length),
             max_L=max(Length))
 
-
 db%>%group_by(fishingseason,Species)%>%
   summarize(mean_L=mean(Length),
             min_L=min(Length),
@@ -702,7 +643,6 @@ db%>%group_by(fishingseason,Species)%>%
 
 
 #compare with last year
-
 lasty <-db4%>%group_by(fishingseason,Species)%>%
   summarize(mean_L=mean(Length),
             min_L=min(Length),
@@ -716,9 +656,10 @@ comp <- db%>%group_by(fishingseason,Species,Lab)%>%
             max_L=max(Length),
             sum=length(Sample))
 
-#write.csv(comp,paste(path.results,'compotheryears.csv',sep="/"),row.names=F)
+#
+write.csv(comp,paste(path.results,'compotheryears.csv',sep="/"),row.names=F)
 
-
+#samples by Lab and month this year
 resum <- table(db$Species,db$month,db$year)
 resum
 
@@ -740,38 +681,38 @@ db$month[db$month=="2"] <- "Feb"
 db$month <- factor(db$month,levels = c("Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb"),ordered=TRUE)  
 
 
-w <- ggplot(db, aes(as.factor(month),Weight..g., color = Species)) +
-  geom_point()+theme_minimal_grid(12)+
-  labs(title = "",y="Individual weight (g)",x="Month")
+# w <- ggplot(db, aes(as.factor(month),Weight..g., color = Species)) +
+#   geom_point()+theme_minimal_grid(12)+
+#   labs(title = "",y="Individual weight (g)",x="Month")
+# 
+# w + facet_grid(rows=vars(Species))
+# 
+# #Save plot
+# #dev.print(device=png,filename=paste(path.results,"Weight_variationsp.png",sep="/"),width=1000,height=800)
+# 
+# 
+# 
+# #same grapgh with geom_violin()
+# w <- ggplot(db, aes(as.factor(month),Weight..g., color = Species)) +
+#   geom_violin()+theme_minimal_grid(12)+geom_jitter()
+# w+labs( title= "", y="Individual weight (g)", x = "Month")
+# 
+# #print(w+labs( title= "", y="Individual weight (g)", x = "Month"))
+# 
+# w1 <- w + geom_violin() + geom_jitter(height = 0, width = 0.1)+facet_grid(rows=vars(Species))
+# 
+# #Save plot
+# #dev.print(device=png,filename=paste(path.results,"Weight_variationsp_2.png",sep="/"),width=1000,height=800)
 
-w + facet_grid(rows=vars(Species))
 
-#Save plot
-#dev.print(device=png,filename=paste(path.results,"Weight_variationsp.png",sep="/"),width=1000,height=800)
-
-
-
-#same grapgh with geom_violin()
-w <- ggplot(db, aes(as.factor(month),Weight..g., color = Species)) +
-  geom_violin()+theme_minimal_grid(12)+geom_jitter()
-w+labs( title= "", y="Individual weight (g)", x = "Month")
-
-#print(w+labs( title= "", y="Individual weight (g)", x = "Month"))
-
-w1 <- w + geom_violin() + geom_jitter(height = 0, width = 0.1)+facet_grid(rows=vars(Species))
-
-#Save plot
-#dev.print(device=png,filename=paste(path.results,"Weight_variationsp_2.png",sep="/"),width=1000,height=800)
-
-
-#another variation with geom_violin
+#geom_violin (selected graph)
 p <- ggplot(db, aes(month, Weight..g.,fill=Species))
 p2 <- p + geom_violin()+ylab("Weight (g)")+xlab("Month")
 
 p2 + facet_grid(rows=vars(Species))+theme_bw()+theme(legend.position = "none")
 
 #Save plot
-#dev.print(device=png,filename=paste(path.results,"Weight_variationsp_3.png",sep="/"),width=1000,height=800)
+dev.print(device=png,filename=paste(path.results,"Weight_variationsp_3.png",sep="/"),width=1000,height=800)
 
 
 
@@ -836,85 +777,16 @@ ages3 <- ages[!is.na(ages$age),]
 summary(ages3)
 ages <- ages3
 
-plot(ages$age~ages$date)
-
+#plot(ages$age~ages$date)
 #ggplot(ages, aes(date, age,colour=species,shape=samplingport))+geom_point(size=2)
-#ggplot(ages, aes(date, age)) +geom_line(aes(linetype = species))
 ggplot(ages, aes(date, age,colour=species)) +geom_boxplot()
 ageyear <- ggplot(ages, aes(species, age))+geom_boxplot(size=0.5)+facet_grid(rows=vars(year))
 #ggplot(ages, aes(species, age))+geom_boxplot(size=0.5)+facet_grid(rows=vars(samplingport))
 agesplab <- ggplot(ages, aes(species, age,colour=samplingport))+geom_boxplot(size=0.5)+theme_bw()
 
 #Save plot
-#ggsave(filename = paste(path.results,paste("Ages_year.png",sep=""),sep="/"),plot = ageyear, width = 25,height = 20, units = "cm", dpi = 300, type = "cairo-png") 
-#ggsave(filename = paste(path.results,paste("Ages_sp_lab.png",sep=""),sep="/"),plot = agesplab, width = 25,height = 20, units = "cm", dpi = 300, type = "cairo-png") 
+ggsave(filename = paste(path.results,paste("Ages_year.png",sep=""),sep="/"),plot = ageyear, width = 25,height = 20, units = "cm", dpi = 300, type = "cairo-png") 
+ggsave(filename = paste(path.results,paste("Ages_sp_lab.png",sep=""),sep="/"),plot = agesplab, width = 25,height = 20, units = "cm", dpi = 300, type = "cairo-png") 
 
 
-
-# #4. PELTIC comparison-----
-# 
-# #aggregated per length class
-# head(sub)
-# 
-# subt <- with(sub, aggregate(NumberOfFish,list(LengthClass=LengthClass, SpeciesAcronym=SpeciesAcronym,SpeciesCode=SpeciesCode),sum))
-# 
-# 
-# #with raised number of fish
-# ggplot(subt, aes(x=LengthClass,y=x/1000000)) +
-#   geom_histogram(binwidth=.5, colour="black", fill="white",stat="identity") +
-#   geom_vline(aes(xintercept=mean(LengthClass, na.rm=T)),   # Ignore NA values for mean
-#              color="red", linetype="dashed", size=1)+facet_grid(rows=vars(SpeciesAcronym))
-# #
-# ggplot(subt, aes(x=LengthClass, y=(x))) +
-#   geom_histogram(binwidth=.5, colour="black", fill="white",stat="identity") +
-#   geom_vline(aes(xintercept=mean(LengthClass, na.rm=T)),   # Ignore NA values for mean
-#              color="red", linetype="dashed", size=1)+facet_grid(rows=vars(SpeciesAcronym))
-# #
-# ggplot(subt, aes(x=LengthClass, y=log(x))) +
-#   geom_histogram(binwidth=.5, colour="black", fill="white",stat="identity") +
-#   geom_vline(aes(xintercept=mean(LengthClass, na.rm=T)),   # Ignore NA values for mean
-#              color="red", linetype="dashed", size=1)+facet_grid(rows=vars(SpeciesAcronym))
-# 
-# 
-# 
-# #select species of interest
-# sub2 <- subset(subt,SpeciesAcronym=="SARD-PIL")
-# sub2
-# 
-# ggplot(sub2, aes(x=LengthClass, y=x)) +
-#   geom_histogram(binwidth=.5, colour="black", fill="white",stat="identity") +
-#   geom_vline(aes(xintercept=mean(LengthClass, na.rm=T)),color="red", linetype="dashed", size=1)
-# +geom_density(alpha=.2, fill="#FF6666") 
-# +scale_x_continuous(breaks=seq(0,max(sub2$LengthClass), 1.0))
-# 
-# 
-# #Save plot
-# #dev.print(device=png,filename=paste(path.results,"exploration_peltic",sep=""),width=1000,height=800)
-
-
-
-##5. Trying to set up connection with sql-----
-# for now it seems there is no conection to be made. They do  a SQL call
-# library(odbc)
-# con <- dbConnect(odbc(),
-#                  Driver = "SQLServer",
-#                  Server = "mysqlhost",
-#                  Database = "mydbname",
-#                  UID = "myuser",
-#                  PWD = rstudioapi::askForPassword("Database password")
-#                  Port = 1433)
-# 
-# 
-# library(odbc)
-# con <- dbConnect(odbc(),
-#                  Driver = "SQLServer",
-#                  Server = "mysqlhost",
-#                  Database = "GARi-Live",
-#                  UID = "SRC01",
-#                  PWD = rstudioapi::askForPassword("password"),
-#                  Port = 1433)
-# 
-# 
-#
-#
 ###############################################  END  ############################################################################----
